@@ -51,10 +51,10 @@ def plot_traces():
         plt.savefig(f"{path}/{int(count / 2)}_{df.index.name}")
         count = count + 1
 
-def get_v0():
+def get_v0(change):
     # dictionary that stores the values of point to start at (1-indexed)
     # for key of trial and concentration
-    start = {
+    error = {
         ("P112G T1", 10) : (2, False),
         ("P112G T1", 25) : (2, False),
         ("P112G T1", 500) : (3, False),
@@ -80,9 +80,9 @@ def get_v0():
                 slope, _intercept, _r_value, _p_value, _std_err = stats.linregress(t, c)
                 return slope
             try:
-                p, b = start[df.index.name, col]
+                p, b = error[df.index.name, col]
                 if not b:
-                    v0s.append(-line_slope(p - 1, 9))
+                    v0s.append(-line_slope(p - 1, p - 1 + change))
                 else:
                     slope = line_slope(p - 1, 5)
                     diff = trace[p - 2] - (slope * (mins[p - 2] - mins[p - 1]) + mins[p - 1])
@@ -91,9 +91,9 @@ def get_v0():
                     plt.figure()
                     plt.scatter(x=mins, y=trace)
                     plt.show()
-                    v0s.append(-line_slope(0, 9))
+                    v0s.append(-line_slope(0, change))
             except KeyError:
-                v0s.append(-line_slope(0, 9))
+                v0s.append(-line_slope(0, change))
         plt.figure()
         plt.scatter(x=conc, y=v0s)
         path = make_path(parent_dir, "Activity Plots/v0 plots")
@@ -103,4 +103,4 @@ def get_v0():
 path = make_path(parent_dir, "Activity Plots/")
 
 plot_traces()
-get_v0()
+get_v0(9)
