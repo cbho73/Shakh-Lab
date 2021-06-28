@@ -4,7 +4,9 @@ from numpy.lib.twodim_base import tri
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime as dt
+import scipy as sc
 from scipy import stats
+import numpy as np
 
 def make_path(parent, child):
     path = os.path.join(parent, child)
@@ -14,11 +16,10 @@ def make_path(parent, child):
 
 parent_dir = "/Users/carlho/Documents/Shakh Lab/"
 data = lambda fname, sname : pd.read_excel(parent_dir + fname, 
-                                    sheet_name=sname, 
-                                    header=0,
-                                    index_col=0,
-                                    usecols="A:I"
-                                    )
+                                           sheet_name=sname, 
+                                           header=0,
+                                           index_col=0,
+                                           usecols="A:I")
 dfs = []
 for n in range(16):
     dfs.append(data("L82V_muts_activity_py.xlsx", f"Sheet{n + 1}"))
@@ -51,7 +52,9 @@ def plot_traces():
         plt.savefig(f"{path}/{int(count / 2)}_{df.index.name}")
         count = count + 1
 
+
 def get_v0(change):
+    v0_vals = []
     # dictionary that stores the values of point to start at (1-indexed)
     # for key of trial and concentration
     error = {
@@ -69,7 +72,10 @@ def get_v0(change):
         ("D118N T2", 10) : (3, True)
     }
     count = 2
+    fit_params = ["slope", "intercept", "r_value", "p_value", "std_err"]
+    regs_data = []
     for df in dfs:
+        linregs = pd.DataFrame(columns=fit_params)
         plt.figure()
         v0s = []
         for col in df.columns:
@@ -77,8 +83,11 @@ def get_v0(change):
             def line_slope(start, delta):
                 t = mins[start : start + delta]
                 c = trace[start : start + delta]
-                slope, _intercept, _r_value, _p_value, _std_err = stats.linregress(t, c)
-                return slope
+                lin_eq = list(stats.linregress(t, c))
+                # print(lin_eq)
+                df_line = pd.DataFrame([lin_eq], index=[df.index.name], columns=fit_params)
+                linregs.append(df_line)
+                return lin_eq[0]
             try:
                 p, b = error[df.index.name, col]
                 if not b:
@@ -88,19 +97,34 @@ def get_v0(change):
                     diff = trace[p - 2] - (slope * (mins[p - 2] - mins[p - 1]) + mins[p - 1])
                     for i in range(p - 1, len(trace)):
                         trace[i] = trace[i] + diff
-                    plt.figure()
-                    plt.scatter(x=mins, y=trace)
-                    plt.show()
                     v0s.append(-line_slope(0, change))
             except KeyError:
                 v0s.append(-line_slope(0, change))
+        regs_data.append(linregs)
+        v0_vals.append(v0s)
+
         plt.figure()
         plt.scatter(x=conc, y=v0s)
         path = make_path(parent_dir, "Activity Plots/v0 plots")
         plt.savefig(f"{path}/{int(count/2)}_{df.index.name}")
         count = count + 1
+    v0_df = pd.DataFrame(v0_vals, index=[df.index.name for df in dfs], columns=conc)
+    v0_df.to_csv(path_or_buf=os.path.join(parent_dir, "v0_values.csv"))
+    return v0_df
+
+# function that describes mode of enzymatics to fit v_0 data
+def noncompetitive(amp, v_max, k_M, k_I):
+    return (v_max * amp) / (k_M + amp * (1 + amp/k_I))
+
+def fit(v0_df):
+    for _name, row in v0_df.iterrows():
+        popt = sc.optimize.curve_fit(noncompetitive, 
+                                     list(row.index), 
+                                     row.to_list())
+        print(popt)
         
 path = make_path(parent_dir, "Activity Plots/")
 
-plot_traces()
-get_v0(9)
+# plot_traces()
+v0_df = get_v0(9)
+fit(v0_df)
