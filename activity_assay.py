@@ -1,4 +1,4 @@
-from os import lseek
+from os import lseek, system
 import os
 from numpy.lib.twodim_base import tri
 import pandas as pd
@@ -35,11 +35,12 @@ def plot_traces(parent_dir, new_dir):
                 cell.set_ylim([0.575, 0.75])
         fig.set_figheight(10)
         fig.set_figwidth(20)
-        c = 0
+
         for col in df.columns:
+            c = df.columns.get_loc(col)
             ax[c//4, c % 4].scatter(x=mins, y=df[col]);
             ax[c//4, c % 4].set_title(f"Well {col}: {conc_dict[col]} uM");
-            c = c + 1
+
         plt.savefig(f"{path}/{int(count / 2)}_{df.index.name}")
         plt.close()
         count = count + 1
@@ -74,15 +75,29 @@ def get_v0(change):
     for df in dfs:
         linregs = pd.DataFrame(columns=fit_params)
         v0s = []
+
+        plt.figure()
+        fig, ax = plt.subplots(2, 4)
+        fig.set_figheight(10)
+        fig.set_figwidth(20)
+
         for col in df.columns:
             trace = pd.Series(df[col]).to_list()
             def line_slope(start, delta):
                 t = mins[start : start + delta]
-                c = trace[start : start + delta]
-                lin_eq = list(stats.linregress(t, c))
-                # print(lin_eq)
+                y_conc = trace[start : start + delta]
+                lin_eq = list(stats.linregress(t, y_conc))
                 df_line = pd.DataFrame([lin_eq], index=[df.index.name], columns=fit_params)
                 linregs.append(df_line)
+
+                # testing (outputting points and line)
+                c = df.columns.get_loc(col)
+                axs = ax[c//4, c % 4]
+                axs.scatter(x=t, y=y_conc);
+                axs.set_title(f"Well {col}: {conc_dict[col]} uM");
+                axs.set_xlim([-0.1, 2.2])
+                axs.set_ylim([0.575, 0.75])
+
                 return lin_eq[0]
             try:
                 p, b = error[df.index.name, col]
@@ -96,7 +111,11 @@ def get_v0(change):
                     v0s.append(-line_slope(0, change))
             except KeyError:
                 v0s.append(-line_slope(0, change))
-            
+        
+        make_path(parent_dir, "v0_test")
+        fig.savefig(os.path.join(parent_dir, f"v0_test/{int(count / 2)}_{df.index.name}"))
+        plt.close()
+
         regs_data.append(linregs)  # linear regression data appending
 
         # appending to v0s
@@ -153,7 +172,7 @@ data = lambda sname : pd.read_excel(parent_dir + fname,
                                            index_col=0,
                                            usecols="A:I")
 
-num_sheets = 10  # number of sheets in excel
+num_sheets = 16  # number of sheets in excel
 dfs = []
 for n in range(num_sheets):
     dfs.append(data(f"Sheet{n + 1}"))
