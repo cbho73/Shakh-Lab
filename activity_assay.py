@@ -41,7 +41,12 @@ def plot_traces():
     count = 2
     for df in dfs:
         plt.figure();
+        # axes = plt.gca()
+        # axes.set_xlim([xmin,xmax])
         fig, ax = plt.subplots(2, 4)
+        for row in ax:
+            for cell in row:
+                cell.set_ylim([0.575, 0.75])
         fig.set_figheight(10)
         fig.set_figwidth(20)
         c = 0
@@ -54,7 +59,6 @@ def plot_traces():
 
 
 def get_v0(change):
-    v0_vals = []
     # dictionary that stores the values of point to start at (1-indexed)
     # for key of trial and concentration
     error = {
@@ -71,9 +75,15 @@ def get_v0(change):
         ("117-164G T1", 500) : (2, False),
         ("D118N T2", 10) : (3, True)
     }
-    count = 2
+    params = ["v_max", "k_M", "k_I"]  # parameters for the curves fitted to inhibition
     fit_params = ["slope", "intercept", "r_value", "p_value", "std_err"]
-    regs_data = []
+        # paramters returned from scipy fit to mode of inhibition
+
+    v0_df = pd.DataFrame(columns=conc)  # v0s for the different trials
+    regs_data = []  # data from linear regressions for each v0 calculation
+    fit_curves = pd.DataFrame(columns=params)
+
+    count = 2
     for df in dfs:
         linregs = pd.DataFrame(columns=fit_params)
         plt.figure()
@@ -100,31 +110,38 @@ def get_v0(change):
                     v0s.append(-line_slope(0, change))
             except KeyError:
                 v0s.append(-line_slope(0, change))
-        regs_data.append(linregs)
-        v0_vals.append(v0s)
+            
+        regs_data.append(linregs)  # linear regression data appending
 
+        # appending to v0s
+        v0_s = pd.Series(v0s, index=conc, name=df.index.name)
+        v0_df = v0_df.append(v0_s)  # adding v0s from n trial to df with all v0s
+
+        # fitting to inhibition model
+        popt, _pcov = sc.optimize.curve_fit(noncompetitive, 
+                                    list(v0_s.index), 
+                                    v0_s.to_list())
+        fitted = pd.Series(data=popt, index=params, name=v0_s.name)
+        fit_curves = fit_curves.append(fitted)
+
+        # plotting the points and function
         plt.figure()
+        pts = []
+        for x in np.arange(start=0, stop=conc[-1], step=1):
+            pts.append(noncompetitive(x, fitted['v_max'], fitted['k_M'], fitted['k_I']))
+        plt.plot(pts)
         plt.scatter(x=conc, y=v0s)
         path = make_path(parent_dir, "Activity Plots/v0 plots")
         plt.savefig(f"{path}/{int(count/2)}_{df.index.name}")
         count = count + 1
-    v0_df = pd.DataFrame(v0_vals, index=[df.index.name for df in dfs], columns=conc)
     v0_df.to_csv(path_or_buf=os.path.join(parent_dir, "v0_values.csv"))
-    return v0_df
+    fit_curves.to_csv(path_or_buf=os.path.join(parent_dir, "curve_params.csv"))
 
 # function that describes mode of enzymatics to fit v_0 data
 def noncompetitive(amp, v_max, k_M, k_I):
     return (v_max * amp) / (k_M + amp * (1 + amp/k_I))
-
-def fit(v0_df):
-    for _name, row in v0_df.iterrows():
-        popt = sc.optimize.curve_fit(noncompetitive, 
-                                     list(row.index), 
-                                     row.to_list())
-        print(popt)
         
 path = make_path(parent_dir, "Activity Plots/")
 
-# plot_traces()
-v0_df = get_v0(9)
-fit(v0_df)
+plot_traces()
+# v0_df = get_v0(8)
