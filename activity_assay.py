@@ -14,16 +14,6 @@ def make_path(parent, child):
         os.mkdir(path)
     return path
 
-parent_dir = "/Users/carlho/Documents/Shakh Lab/"
-data = lambda fname, sname : pd.read_excel(parent_dir + fname, 
-                                           sheet_name=sname, 
-                                           header=0,
-                                           index_col=0,
-                                           usecols="A:I")
-dfs = []
-for n in range(16):
-    dfs.append(data("L82V_muts_activity_py.xlsx", f"Sheet{n + 1}"))
-
 def to_minutes(t):
     o = dt.time(0, 0, 0)
     date = dt.date(1,1,1)
@@ -31,13 +21,8 @@ def to_minutes(t):
     t_delta = combine(t) - combine(o)
     return t_delta.seconds/60
 
-mins = pd.Series(dfs[0].index).apply(to_minutes) # convert time to mins
-label = ["A", "B", "C", "D", "E", "F", "G", "H"] # labels for wells
-conc = [10, 25, 50, 100, 200, 300, 400, 500] # concentrations
-conc_dict = dict(zip(label, conc))
-
-def plot_traces():
-    path = make_path(parent_dir, "Activity Plots/Traces")
+def plot_traces(parent_dir, new_dir):
+    path = make_path(parent_dir, new_dir)
     count = 2
     for df in dfs:
         plt.figure();
@@ -46,6 +31,7 @@ def plot_traces():
         fig, ax = plt.subplots(2, 4)
         for row in ax:
             for cell in row:
+                cell.set_xlim([-0.1, 2.2])
                 cell.set_ylim([0.575, 0.75])
         fig.set_figheight(10)
         fig.set_figwidth(20)
@@ -55,6 +41,7 @@ def plot_traces():
             ax[c//4, c % 4].set_title(f"Well {col}: {conc_dict[col]} uM");
             c = c + 1
         plt.savefig(f"{path}/{int(count / 2)}_{df.index.name}")
+        plt.close()
         count = count + 1
 
 
@@ -86,7 +73,6 @@ def get_v0(change):
     count = 2
     for df in dfs:
         linregs = pd.DataFrame(columns=fit_params)
-        plt.figure()
         v0s = []
         for col in df.columns:
             trace = pd.Series(df[col]).to_list()
@@ -119,12 +105,15 @@ def get_v0(change):
 
         # fitting to inhibition model
         popt, _pcov = sc.optimize.curve_fit(noncompetitive, 
-                                    list(v0_s.index), 
-                                    v0_s.to_list())
+                                            list(v0_s.index), 
+                                            v0_s.to_list(), 
+                                            bounds=(0, np.inf), 
+                                            verbose=0)
+
         fitted = pd.Series(data=popt, index=params, name=v0_s.name)
         fit_curves = fit_curves.append(fitted)
 
-        # plotting the points and function
+        # plotting the v0 points and fitted function
         plt.figure()
         pts = []
         for x in np.arange(start=0, stop=conc[-1], step=1):
@@ -133,15 +122,46 @@ def get_v0(change):
         plt.scatter(x=conc, y=v0s)
         path = make_path(parent_dir, "Activity Plots/v0 plots")
         plt.savefig(f"{path}/{int(count/2)}_{df.index.name}")
+        plt.close()
         count = count + 1
+    
+    # plotting k_M vs k_I
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    ax.set_xlabel(r"$K_M$")
+    ax.set_ylabel(r"$K_I$")
+    for name, row in fit_curves.iterrows():
+        ax.scatter(x=row['k_M'], y=row['k_I'], label=name)
+    ax.legend()
+    fig.savefig(f"{parent_dir}/kM_vs_kI")
+    plt.close()
+
+    # outputting data to csv
     v0_df.to_csv(path_or_buf=os.path.join(parent_dir, "v0_values.csv"))
     fit_curves.to_csv(path_or_buf=os.path.join(parent_dir, "curve_params.csv"))
 
 # function that describes mode of enzymatics to fit v_0 data
 def noncompetitive(amp, v_max, k_M, k_I):
     return (v_max * amp) / (k_M + amp * (1 + amp/k_I))
-        
-path = make_path(parent_dir, "Activity Plots/")
 
-plot_traces()
-# v0_df = get_v0(8)
+parent_dir = "/Users/carlho/Documents/Shakh Lab/"
+make_path(parent_dir, "Activity Plots")
+fname = "L82V_muts_activity_py.xlsx"
+data = lambda sname : pd.read_excel(parent_dir + fname, 
+                                           sheet_name=sname, 
+                                           header=0,
+                                           index_col=0,
+                                           usecols="A:I")
+
+num_sheets = 10  # number of sheets in excel
+dfs = []
+for n in range(num_sheets):
+    dfs.append(data(f"Sheet{n + 1}"))
+
+mins = pd.Series(dfs[0].index).apply(to_minutes) # convert time to mins
+label = ["A", "B", "C", "D", "E", "F", "G", "H"] # labels for wells
+conc = [10, 25, 50, 100, 200, 300, 400, 500]     # concentrations
+conc_dict = dict(zip(label, conc))               
+
+# plot_traces(parent_dir, "Activity Plots/Traces")
+v0_df = get_v0(8)
