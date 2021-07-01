@@ -23,16 +23,14 @@ def to_minutes(t):
 
 def plot_traces(parent_dir, new_dir):
     path = make_path(parent_dir, new_dir)
-    count = 2
+    count = 0
     for df in dfs:
         plt.figure();
-        # axes = plt.gca()
-        # axes.set_xlim([xmin,xmax])
         fig, ax = plt.subplots(2, 4)
-        for row in ax:
-            for cell in row:
-                cell.set_xlim([-0.1, 2.2])
-                cell.set_ylim([0.575, 0.75])
+        # for row in ax:
+        #     for cell in row:
+        #         cell.set_xlim([-0.1, 2.2])
+        #         cell.set_ylim([0.575, 0.75])
         fig.set_figheight(10)
         fig.set_figwidth(20)
 
@@ -41,7 +39,7 @@ def plot_traces(parent_dir, new_dir):
             ax[c//4, c % 4].scatter(x=mins, y=df[col]);
             ax[c//4, c % 4].set_title(f"Well {col}: {conc_dict[col]} uM");
 
-        plt.savefig(f"{path}/{int(count / 2)}_{df.index.name}")
+        plt.savefig(f"{path}/{order(count)}_{df.index.name}")
         plt.close()
         count = count + 1
 
@@ -50,18 +48,18 @@ def get_v0(change):
     # dictionary that stores the values of point to start at (1-indexed)
     # for key of trial and concentration
     error = {
-        ("P112G T1", 10) : (2, False),
-        ("P112G T1", 25) : (2, False),
-        ("P112G T1", 500) : (3, False),
-        ("V117G T1", 50) : (4, False),
-        ("V117G T1", 200) : (2, False),
-        ("V117G T2", 10) : (2, False),
-        ("L168G T1", 100) : (6, False),
-        ("L168G T1", 500) : (2, False),
-        ("117-164G T1", 100) : (2, False),
-        ("117-164G T1", 400) : (2, False),
-        ("117-164G T1", 500) : (2, False),
-        ("D118N T2", 10) : (3, True)
+        # ("P112G T1", 10) : (2, False),
+        # ("P112G T1", 25) : (2, False),
+        # ("P112G T1", 500) : (3, False),
+        # ("V117G T1", 50) : (4, False),
+        # ("V117G T1", 200) : (2, False),
+        # ("V117G T2", 10) : (2, False),
+        # ("L168G T1", 100) : (6, False),
+        # ("L168G T1", 500) : (2, False),
+        # ("117-164G T1", 100) : (2, False),
+        # ("117-164G T1", 400) : (2, False),
+        # ("117-164G T1", 500) : (2, False),
+        # ("D118N T2", 10) : (3, True)
     }
     params = ["v_max", "k_M", "k_I"]  # parameters for the curves fitted to inhibition
     fit_params = ["slope", "intercept", "r_value", "p_value", "std_err"]
@@ -71,7 +69,7 @@ def get_v0(change):
     regs_data = []  # data from linear regressions for each v0 calculation
     fit_curves = pd.DataFrame(columns=params)
 
-    count = 2
+    count = 0
     for df in dfs:
         linregs = pd.DataFrame(columns=fit_params)
         v0s = []
@@ -95,8 +93,9 @@ def get_v0(change):
                 axs = ax[c//4, c % 4]
                 axs.scatter(x=t, y=y_conc);
                 axs.set_title(f"Well {col}: {conc_dict[col]} uM");
-                axs.set_xlim([-0.1, 2.2])
-                axs.set_ylim([0.575, 0.75])
+
+                # axs.set_xlim([-0.1, 2.2])
+                # axs.set_ylim([0.575, 0.75])
 
                 return lin_eq[0]
             try:
@@ -113,7 +112,7 @@ def get_v0(change):
                 v0s.append(-line_slope(0, change))
         
         make_path(parent_dir, "v0_test")
-        fig.savefig(os.path.join(parent_dir, f"v0_test/{int(count / 2)}_{df.index.name}"))
+        fig.savefig(os.path.join(parent_dir, f"v0_test/{order(count)}_{df.index.name}"))
         plt.close()
 
         regs_data.append(linregs)  # linear regression data appending
@@ -123,11 +122,14 @@ def get_v0(change):
         v0_df = v0_df.append(v0_s)  # adding v0s from n trial to df with all v0s
 
         # fitting to inhibition model
-        popt, _pcov = sc.optimize.curve_fit(noncompetitive, 
-                                            list(v0_s.index), 
-                                            v0_s.to_list(), 
-                                            bounds=(0, np.inf), 
-                                            verbose=0)
+        try: 
+            popt, _pcov = sc.optimize.curve_fit(noncompetitive, 
+                                                list(v0_s.index), 
+                                                v0_s.to_list(), 
+                                                bounds=(0, np.inf), 
+                                                verbose=0)
+        except RuntimeError:
+            print(f"unable to fit for {df.index.name}")
 
         fitted = pd.Series(data=popt, index=params, name=v0_s.name)
         fit_curves = fit_curves.append(fitted)
@@ -140,7 +142,7 @@ def get_v0(change):
         plt.plot(pts)
         plt.scatter(x=conc, y=v0s)
         path = make_path(parent_dir, "Activity Plots/v0 plots")
-        plt.savefig(f"{path}/{int(count/2)}_{df.index.name}")
+        plt.savefig(f"{path}/{order(count)}_{df.index.name}")
         plt.close()
         count = count + 1
     
@@ -163,24 +165,38 @@ def get_v0(change):
 def noncompetitive(amp, v_max, k_M, k_I):
     return (v_max * amp) / (k_M + amp * (1 + amp/k_I))
 
-parent_dir = "/Users/carlho/Documents/Shakh Lab/"
-make_path(parent_dir, "Activity Plots")
-fname = "L82V_muts_activity_py.xlsx"
-data = lambda sname : pd.read_excel(parent_dir + fname, 
-                                           sheet_name=sname, 
-                                           header=0,
-                                           index_col=0,
-                                           usecols="A:I")
+# PARAMETERS TO CHANGE
+lab_dir = "/Users/carlho/Documents/Shakh Lab/"
+fname = "L82V_muts_activity_2.xlsx"
+run = 2  # what run of activity assay is this?
+num_tables = 35  # number of sheets in excel
+table_len = 25  # length of table data entries
+spacers = 2  # length of non-data parts of table, header, spacing, etc
+headers = [(table_len + spacers) * n + 2 for n in range(num_tables)]
+ntrials = 4
+ordering = [5, 6, 9, 1, 2, 3, 4, 7, 8]  # trial numbering (because I went out of order)
+order = lambda count : ordering[int(count / ntrials)]
+trials = [2 if n > 7 else 4 for n in range(9)]
+trial_order = dict(zip(ordering, trials))
 
-num_sheets = 16  # number of sheets in excel
-dfs = []
-for n in range(num_sheets):
-    dfs.append(data(f"Sheet{n + 1}"))
-
-mins = pd.Series(dfs[0].index).apply(to_minutes) # convert time to mins
 label = ["A", "B", "C", "D", "E", "F", "G", "H"] # labels for wells
 conc = [10, 25, 50, 100, 200, 300, 400, 500]     # concentrations
 conc_dict = dict(zip(label, conc))               
+
+dfs = []
+parent_dir = make_path(lab_dir, f"activity_run{run}")
+make_path(parent_dir, "Activity Plots")
+for header in headers:
+    df = pd.read_excel(os.path.join(lab_dir, fname), 
+                             sheet_name="Sheet1", 
+                             header=header,
+                             index_col=0, 
+                             usecols="A:I",
+                             nrows=table_len)
+    df.columns = label
+    dfs.append(df)
+
+mins = pd.Series(dfs[0].index).apply(to_minutes) # convert time to mins
 
 # plot_traces(parent_dir, "Activity Plots/Traces")
 v0_df = get_v0(8)
