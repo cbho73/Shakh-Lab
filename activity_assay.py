@@ -45,7 +45,6 @@ def plot_traces(parent_dir, new_dir):
         plt.close()
         count = count + 1
 
-
 def get_v0(change):
     # dictionary that stores the values of point to start at (1-indexed)
     # for key of trial and concentration
@@ -120,7 +119,6 @@ def get_v0(change):
     # outputting data to csv
     v0_df.to_csv(path_or_buf=os.path.join(parent_dir, "v0_values.csv"))
     return v0_df
-
 
 def fit_v0s(v0_df, dir, order, kMvkI=False, stderr=None, overlay=None):
     params = ["v_max", "k_M", "k_I"]  # parameters for the curves fitted to inhibition
@@ -206,7 +204,6 @@ def average_v0(v0_df):
             kMvkI=True, 
             stderr=stdev_df, 
             overlay='L82V')
-
 # function that describes mode of enzymatics to fit v_0 data
 def noncompetitive(amp, v_max, k_M, k_I):
     return (v_max * amp) / (k_M + amp * (1 + amp/k_I))

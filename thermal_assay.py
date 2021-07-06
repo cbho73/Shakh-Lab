@@ -3,33 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import csv
 
-# reading the data into panda DataFrames
-path = "/Users/carlho/Documents/Shakh Lab/2021_06_21_L82V_hingemuts/"
-data = lambda fname : pd.read_excel(path + fname, 
-                      sheet_name="FRET", 
-                      header=0,
-                      index_col=0,
-                      usecols="B:CT")
-df_amp = data("badkar_2021-06-21 16-31-27_CT010444 - " + 
-                " Melt Curve Amplification Results.xlsx")
-df_deriv = data("badkar_2021-06-21 16-31-27_CT010444 - " + 
-                " Melt Curve Derivative Results.xlsx")
-
-# wanted header names in DataFrames
-rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-cols = range(1, 13)
-headers = []
-
-for num in cols:
-    headers.append([])
-    for letter in rows:
-        headers[-1].append(letter + str(num))
-col = [1, 2, 4, 5]  # columns where the samples are stored
-molarity = lambda n : "2" if n < 3 else "4"
-trial = lambda n : n if n < 3 else n - 3
-
-# print(len(headers))
-
 # plot and save graphs
 def plot():
     # print(df_amp.head())
@@ -59,6 +32,31 @@ def melting():
                 # print(f"{name}_{molarity(n)}uM_t{trial(n)}: {s.idxmin()}")
             writer.writerow(names)
             writer.writerow(row)
+
+# reading the data into panda DataFrames
+path = "/Users/carlho/Documents/Shakh Lab/2021_06_21_L82V_hingemuts/"
+data = lambda fname : pd.read_excel(path + fname, 
+                      sheet_name="FRET", 
+                      header=0,
+                      index_col=0,
+                      usecols="B:CT")
+df_amp = data("badkar_2021-06-21 16-31-27_CT010444 - " + 
+                " Melt Curve Amplification Results.xlsx")
+df_deriv = data("badkar_2021-06-21 16-31-27_CT010444 - " + 
+                " Melt Curve Derivative Results.xlsx")
+
+# wanted header names in DataFrames
+rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+cols = range(1, 13)
+headers = []
+
+for num in cols:
+    headers.append([])
+    for letter in rows:
+        headers[-1].append(letter + str(num))
+col = [1, 2, 4, 5]  # columns where the samples are stored
+molarity = lambda n : "2" if n < 3 else "4"
+trial = lambda n : n if n < 3 else n - 3
 
 # plot();  # uncomment to plot graphs
 melting();
