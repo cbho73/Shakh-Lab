@@ -1,5 +1,7 @@
 from os import lseek, system
 import os
+from typing import NamedTuple
+from numpy.core.fromnumeric import std
 from numpy.lib.twodim_base import tri
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -61,13 +63,11 @@ def get_v0(change):
         # ("117-164G T1", 500) : (2, False),
         # ("D118N T2", 10) : (3, True)
     }
-    params = ["v_max", "k_M", "k_I"]  # parameters for the curves fitted to inhibition
     fit_params = ["slope", "intercept", "r_value", "p_value", "std_err"]
         # paramters returned from scipy fit to mode of inhibition
-
     v0_df = pd.DataFrame(columns=conc)  # v0s for the different trials
     regs_data = []  # data from linear regressions for each v0 calculation
-    fit_curves = pd.DataFrame(columns=params)
+
 
     count = 0
     for df in dfs:
@@ -114,13 +114,23 @@ def get_v0(change):
         make_path(parent_dir, "v0_test")
         fig.savefig(os.path.join(parent_dir, f"v0_test/{order(count)}_{df.index.name}"))
         plt.close()
-
         regs_data.append(linregs)  # linear regression data appending
-
-        # appending to v0s
         v0_s = pd.Series(v0s, index=conc, name=df.index.name)
         v0_df = v0_df.append(v0_s)  # adding v0s from n trial to df with all v0s
+    # outputting data to csv
+    v0_df.to_csv(path_or_buf=os.path.join(parent_dir, "v0_values.csv"))
+    return v0_df
 
+
+def fit_v0s(v0_df, dir, order, kMvkI=False, stderr=None, overlay=None):
+    params = ["v_max", "k_M", "k_I"]  # parameters for the curves fitted to inhibition
+    fit_curves = pd.DataFrame(columns=params)
+    path = make_path(parent_dir, f"Activity Plots/{dir}")
+
+    count = 0
+    # print(stderr)
+    for name, v0_s in v0_df.iterrows():
+        # appending to v0s
         # fitting to inhibition model
         try: 
             popt, _pcov = sc.optimize.curve_fit(noncompetitive, 
@@ -133,33 +143,69 @@ def get_v0(change):
 
         fitted = pd.Series(data=popt, index=params, name=v0_s.name)
         fit_curves = fit_curves.append(fitted)
-
+    for name, fitted in fit_curves.iterrows():
         # plotting the v0 points and fitted function
+        v0_s = v0_df.loc[name]
         plt.figure()
-        pts = []
-        for x in np.arange(start=0, stop=conc[-1], step=1):
-            pts.append(noncompetitive(x, fitted['v_max'], fitted['k_M'], fitted['k_I']))
-        plt.plot(pts)
-        plt.scatter(x=conc, y=v0s)
-        path = make_path(parent_dir, "Activity Plots/v0 plots")
-        plt.savefig(f"{path}/{order(count)}_{df.index.name}")
+        def fn_range(fn_params):
+            pts = []
+            for x in np.arange(start=0, stop=conc[-1], step=1):
+                pts.append(noncompetitive(x, 
+                                          fn_params['v_max'], 
+                                          fn_params['k_M'], 
+                                          fn_params['k_I']))
+            return pts
+        plt.plot(fn_range(fitted), label=name)
+        plt.scatter(x=conc, y=v0_s)
+        if stderr is not None:
+            plt.errorbar(x=conc, y=v0_s, fmt='o', yerr=stderr.loc[name])
+        plt.savefig(f"{path}/{order(count)}_{name}")
+        if overlay is not None and fitted.loc['k_I'] > fit_curves.loc[overlay, 'k_I']:
+            plt.plot(fn_range(fit_curves.loc[overlay]), label=overlay)
+            plt.legend()
+            overlay_path = make_path(path, 'overlay')
+            plt.savefig(f"{overlay_path}/{order(count)}_{name}")
         plt.close()
         count = count + 1
     
     # plotting k_M vs k_I
-    fig = plt.figure()
-    ax = fig.add_subplot()
-    ax.set_xlabel(r"$K_M$")
-    ax.set_ylabel(r"$K_I$")
-    for name, row in fit_curves.iterrows():
-        ax.scatter(x=row['k_M'], y=row['k_I'], label=name)
-    ax.legend()
-    fig.savefig(f"{parent_dir}/kM_vs_kI")
-    plt.close()
+    if kMvkI:
+        fig = plt.figure()
+        ax = fig.add_subplot()
+        ax.set_xlabel(r"$K_M$")
+        ax.set_ylabel(r"$K_I$")
+        for name, row in fit_curves.iterrows():
+            ax.scatter(x=row['k_M'], y=row['k_I'], label=name)
+        ax.legend()
+        fig.savefig(f"{parent_dir}/kM_vs_kI")
+        plt.close()
+    fit_curves.to_csv(path_or_buf=os.path.join(path, "curve_params.csv"))
+    return fit_curves
 
-    # outputting data to csv
-    v0_df.to_csv(path_or_buf=os.path.join(parent_dir, "v0_values.csv"))
-    fit_curves.to_csv(path_or_buf=os.path.join(parent_dir, "curve_params.csv"))
+def average_v0(v0_df):
+    avg_df = pd.DataFrame()  # v0s for the different trials
+    stdev_df = pd.DataFrame()  # standard deviation for the trials
+    for t in range(9):
+        name = v0_df.index[t*ntrials].strip().split()[0]
+        if t != 8:
+            avg = v0_df[t*ntrials:t*ntrials+ntrials].mean(axis=0)
+            stdev = v0_df[t*ntrials:t*ntrials+ntrials].std(axis=0)
+            stdev.name = name
+            avg.name = name
+        else:
+            avg = v0_df[t*ntrials:t*ntrials+2].mean(axis=0)
+            stdev = v0_df[t*ntrials:t*ntrials+2].std(axis=0)
+            stdev.name = name
+            avg.name = name
+        avg_df = avg_df.append(avg)
+        stdev_df = stdev_df.append(stdev)
+    order = lambda count : ordering[count]
+    fit_v0s(avg_df, 
+            "avg v0 plots", 
+            order, 
+            kMvkI=True, 
+            stderr=stdev_df, 
+            overlay='L82V')
 
 # function that describes mode of enzymatics to fit v_0 data
 def noncompetitive(amp, v_max, k_M, k_I):
@@ -180,7 +226,7 @@ trials = [2 if n > 7 else 4 for n in range(9)]
 trial_order = dict(zip(ordering, trials))
 
 label = ["A", "B", "C", "D", "E", "F", "G", "H"] # labels for wells
-conc = [10, 25, 50, 100, 200, 300, 400, 500]     # concentrations
+conc = [2.5, 5, 10, 25, 50, 100, 250, 500]     # concentrations
 conc_dict = dict(zip(label, conc))               
 
 dfs = []
@@ -198,5 +244,17 @@ for header in headers:
 
 mins = pd.Series(dfs[0].index).apply(to_minutes) # convert time to mins
 
+redo = True
+v0_path = os.path.join(parent_dir, "v0_values.csv")
+if os.path.exists(v0_path) and not redo:
+    v0_df = pd.read_csv(v0_path, 
+                             header=0,
+                             index_col=0, 
+                             usecols=[n for n in range(9)])
+    # print(v0_df)
+else:
+    v0_df = get_v0(8)
+
 # plot_traces(parent_dir, "Activity Plots/Traces")
-v0_df = get_v0(8)
+# fit_v0s(v0_df, "v0 plots", order)
+average_v0(v0_df)
