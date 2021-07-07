@@ -183,7 +183,7 @@ def fit_v0s(v0_df, dir, order, kMvkI=False, stderr=None, overlay=None):
 def average_v0(v0_df):
     avg_df = pd.DataFrame()  # v0s for the different trials
     stdev_df = pd.DataFrame()  # standard deviation for the trials
-    for t in range(9):
+    for t in range(len(ordering)):
         name = v0_df.index[t*ntrials].strip().split()[0]
         if t != 8:
             avg = v0_df[t*ntrials:t*ntrials+ntrials].mean(axis=0)
@@ -203,27 +203,28 @@ def average_v0(v0_df):
             order, 
             kMvkI=True, 
             stderr=stdev_df, 
-            overlay='L82V')
+            overlay=overlay_L82V)
 # function that describes mode of enzymatics to fit v_0 data
 def noncompetitive(amp, v_max, k_M, k_I):
     return (v_max * amp) / (k_M + amp * (1 + amp/k_I))
 
 # PARAMETERS TO CHANGE
 lab_dir = "/Users/carlho/Documents/Shakh Lab/"
-fname = "L82V_muts_activity_2.xlsx"
-run = 2  # what run of activity assay is this?
-num_tables = 35  # number of sheets in excel
+fname = "L82V_muts_activity_3.xlsx"
+run = 3  # what run of activity assay is this?
+num_tables = 24  # number of sheets in excel
 table_len = 25  # length of table data entries
 spacers = 2  # length of non-data parts of table, header, spacing, etc
 headers = [(table_len + spacers) * n + 2 for n in range(num_tables)]
 ntrials = 4
-ordering = [5, 6, 9, 1, 2, 3, 4, 7, 8]  # trial numbering (because I went out of order)
+ordering = [1, 2, 3, 4, 5, 6]  # trial numbering (because I went out of order)
 order = lambda count : ordering[int(count / ntrials)]
-trials = [2 if n > 7 else 4 for n in range(9)]
+trials = [4 for n in range(len(ordering))]
 trial_order = dict(zip(ordering, trials))
+overlay_L82V = None  
 
 label = ["A", "B", "C", "D", "E", "F", "G", "H"] # labels for wells
-conc = [2.5, 5, 10, 25, 50, 100, 250, 500]     # concentrations
+conc = [2.5, 10, 25, 50, 100, 200, 350, 500]     # concentrations
 conc_dict = dict(zip(label, conc))               
 
 dfs = []
@@ -252,6 +253,6 @@ if os.path.exists(v0_path) and not redo:
 else:
     v0_df = get_v0(8)
 
-# plot_traces(parent_dir, "Activity Plots/Traces")
-# fit_v0s(v0_df, "v0 plots", order)
+plot_traces(parent_dir, "Activity Plots/Traces")
+fit_v0s(v0_df, "v0 plots", order)
 average_v0(v0_df)
