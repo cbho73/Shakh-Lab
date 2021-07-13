@@ -210,16 +210,16 @@ def noncompetitive(amp, v_max, k_M, k_I):
 
 # PARAMETERS TO CHANGE
 lab_dir = "/Users/carlho/Documents/Shakh Lab/"
-fname = "L82V_muts_activity_3.xlsx"
-run = 3  # what run of activity assay is this?
-num_tables = 24  # number of sheets in excel
+fname = "L82V_muts_activity_4.xlsx"
+run = 4  # what run of activity assay is this?
+num_tables = 6  # number of sheets in excel
 table_len = 25  # length of table data entries
 spacers = 2  # length of non-data parts of table, header, spacing, etc
 headers = [(table_len + spacers) * n + 2 for n in range(num_tables)]
-ntrials = 4
-ordering = [1, 2, 3, 4, 5, 6]  # trial numbering (because I went out of order)
+ntrials = 2
+ordering = [1, 2, 3]  # trial numbering
 order = lambda count : ordering[int(count / ntrials)]
-trials = [4 for n in range(len(ordering))]
+trials = [ntrials for n in range(len(ordering))]
 trial_order = dict(zip(ordering, trials))
 overlay_L82V = None  
 
