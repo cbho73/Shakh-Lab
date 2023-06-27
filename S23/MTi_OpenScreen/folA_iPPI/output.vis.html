@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pose explorer</title>
+    <link href="/portal/css/mobyle.css" rel="stylesheet" type="text/css" media="screen">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.3.15/slick.css"/>
+    <script type="text/javascript" src='/portal/js/jquery.js'></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.3.15/slick.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+    .slick-prev:before, .slick-next:before { color: green; }
+    #slider { margin-left: 25px; margin-right: 25px; display: block; box-sizing: border box; position: relative; width: 750px;  }
+    .slider-ligand {  cursor: pointer; text-align: center; border: 1px dashed #ccc; height: 80px; margin: 10px; padding: 10px; line-height: 40px; }
+    div.slick-active { background-color: rgb(185, 232, 186); }
+    </style>
+  </head>
+    
+  <body>
+    
+    <table>
+      <tr>
+        <td width="800">
+          <div id="gl"></div>
+        </td>
+        <td>
+          <div id="protein">
+            <h3>Protein style</h3>
+            <input type="radio" name="protein-representation" id="protein-cartoon" checked>Cartoon</input><br/>
+            <input type="radio" name="protein-representation" id="protein-ballsandsticks">Balls & Sticks</input><br/>
+            <input type="radio" name="protein-representation" id="protein-lines">Lines</input><br/>
+            <input type="radio" name="protein-representation" id="protein-line-trace">Line Trace</input><br/>
+            <input type="radio" name="protein-representation" id="protein-sline">Smooth Line Trace</input><br/>
+            <input type="radio" name="protein-representation" id="protein-trace">Trace</input><br/>
+          </div>
+
+          <div id=color>
+            <h3>Color by</h3>
+            <input type="radio" name="color-representation" id="color-default">Default</input><br/>
+            <input type="radio" name="color-representation" id="color-succession">Succession</input><br/>
+            <input type="radio" name="color-representation" id="color-occupancy">Occupancy</input><br/>
+            <input type="radio" name="color-representation" id="color-tempfactor">Temperature factor</input><br/>
+            Intensity: <input type="range" id="color-gradient" step="0.01" min="0.01" max="0.99" />
+          </div>
+          
+          <div id=ligand>
+            <h3>Ligand style</h3>
+            <input type="radio" name="ligand-representation" id="ligand-ballsandsticks" checked>Balls & Sticks</input><br/>
+            <input type="radio" name="ligand-representation" id="ligand-lines">Lines</input><br/>
+          </div>
+
+        </td>
+      </tr>
+      <tr>
+          <td>
+            <h2>Select ligand to show:</h2>
+            <div id="slider">
+                
+                <div class="slider-ligand" id="pdb_out/model1.pdb"><h3>26651606_Intermediate</h3><p>MODEL 1, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model2.pdb"><h3>17452383_Intermediate</h3><p>MODEL 2, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model3.pdb"><h3>22411998_Intermediate</h3><p>MODEL 3, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model4.pdb"><h3>22411598_Intermediate</h3><p>MODEL 4, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model5.pdb"><h3>103059844_Intermediate</h3><p>MODEL 5, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model6.pdb"><h3>26617127_Intermediate</h3><p>MODEL 6, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model7.pdb"><h3>11534736_Intermediate</h3><p>MODEL 7, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model8.pdb"><h3>24327827_Intermediate</h3><p>MODEL 8, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model9.pdb"><h3>24804071_Intermediate</h3><p>MODEL 9, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model10.pdb"><h3>26661716_Intermediate</h3><p>MODEL 10, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model11.pdb"><h3>49819547_Accepted</h3><p>MODEL 11, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model12.pdb"><h3>24288718_Intermediate</h3><p>MODEL 12, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model13.pdb"><h3>17460430_Accepted</h3><p>MODEL 13, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model14.pdb"><h3>24356822_Intermediate</h3><p>MODEL 14, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model15.pdb"><h3>49681067_Accepted</h3><p>MODEL 15, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model16.pdb"><h3>24328527_Intermediate</h3><p>MODEL 16, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model17.pdb"><h3>92764569_Accepted</h3><p>MODEL 17, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model18.pdb"><h3>17506657_Intermediate</h3><p>MODEL 18, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model19.pdb"><h3>24312258_Intermediate</h3><p>MODEL 19, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model20.pdb"><h3>103060289_Accepted</h3><p>MODEL 20, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model21.pdb"><h3>99454415_Intermediate</h3><p>MODEL 21, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model22.pdb"><h3>17438626_Intermediate</h3><p>MODEL 22, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model23.pdb"><h3>14727027_Intermediate</h3><p>MODEL 23, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model24.pdb"><h3>24292405_Intermediate</h3><p>MODEL 24, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model25.pdb"><h3>24785630_Intermediate</h3><p>MODEL 25, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model26.pdb"><h3>57265530_Intermediate</h3><p>MODEL 26, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model27.pdb"><h3>14738949_Intermediate</h3><p>MODEL 27, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model28.pdb"><h3>24390232_Intermediate</h3><p>MODEL 28, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model29.pdb"><h3>24389665_Intermediate</h3><p>MODEL 29, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model30.pdb"><h3>17474558_Intermediate</h3><p>MODEL 30, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model31.pdb"><h3>103074475_Intermediate</h3><p>MODEL 31, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model32.pdb"><h3>17506356_Intermediate</h3><p>MODEL 32, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model33.pdb"><h3>24392427_Accepted</h3><p>MODEL 33, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model34.pdb"><h3>24343902_Intermediate</h3><p>MODEL 34, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model35.pdb"><h3>24281770_Intermediate</h3><p>MODEL 35, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model36.pdb"><h3>87335393_Accepted</h3><p>MODEL 36, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model37.pdb"><h3>124949582_Intermediate</h3><p>MODEL 37, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model38.pdb"><h3>24389158_Intermediate</h3><p>MODEL 38, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model39.pdb"><h3>11532888_Intermediate</h3><p>MODEL 39, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model40.pdb"><h3>24839682_Accepted</h3><p>MODEL 40, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model41.pdb"><h3>22411586_Intermediate</h3><p>MODEL 41, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model42.pdb"><h3>49668543_Intermediate</h3><p>MODEL 42, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model43.pdb"><h3>4265629_Intermediate</h3><p>MODEL 43, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model44.pdb"><h3>24376692_Intermediate</h3><p>MODEL 44, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model45.pdb"><h3>124895953_Intermediate</h3><p>MODEL 45, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model46.pdb"><h3>56318392_Intermediate</h3><p>MODEL 46, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model47.pdb"><h3>26731412_Intermediate</h3><p>MODEL 47, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model48.pdb"><h3>24268692_Intermediate</h3><p>MODEL 48, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model49.pdb"><h3>3712638_Intermediate</h3><p>MODEL 49, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model50.pdb"><h3>47200577_Accepted</h3><p>MODEL 50, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model51.pdb"><h3>17402166_Intermediate</h3><p>MODEL 51, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model52.pdb"><h3>7975326_Intermediate</h3><p>MODEL 52, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model53.pdb"><h3>85201144_Intermediate</h3><p>MODEL 53, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model54.pdb"><h3>24297861_Intermediate</h3><p>MODEL 54, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model55.pdb"><h3>17408593_Intermediate</h3><p>MODEL 55, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model56.pdb"><h3>26731583_Intermediate</h3><p>MODEL 56, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model57.pdb"><h3>14741545_Accepted</h3><p>MODEL 57, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model58.pdb"><h3>26646894_Intermediate</h3><p>MODEL 58, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model59.pdb"><h3>26730581_Intermediate</h3><p>MODEL 59, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model60.pdb"><h3>24372182_Intermediate</h3><p>MODEL 60, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model61.pdb"><h3>26529515_Intermediate</h3><p>MODEL 61, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model62.pdb"><h3>49718586_Intermediate</h3><p>MODEL 62, -0.0 kCal/mol</p></div>
+                
+            </div>
+          </td>
+          <td></td>
+      </tr>
+    </table>
+   
+  </body>
+  <script src='/portal/js/pv/pv.min.js'></script>
+  <script>
+
+    var pv = pv.Viewer(document.getElementById('gl'), {
+               width: 800,
+               height: 600,
+               antialias: true,
+               quality: 'high',
+               outline: false
+             });
+
+    var structs = {};
+    var structure; // this variable must exist
+
+    function getcolor(name) {
+      var ccolor = null;
+      var color_name = $('#color input:checked').attr('id');
+      if (name == "ligand") {
+          return ccolor;
+      } else {
+        if (color_name == "color-occupancy") {
+          ccolor = color.byAtomProp('occupancy');
+        }
+        if (color_name == "color-tempfactor") {
+          var color_map = ['red','white','blue']
+          var threshold = parseFloat(1.0 - $('#color-gradient').val());
+          var steps = [0.0, threshold, 1.0];
+          ccolor = color.byAtomProp('tempFactor', color.gradient(color_map, steps));
+        }
+        if (color_name == "color-default") {
+          ccolor = color.uniform('orange');
+        }
+      }
+      return ccolor;
+    }
+
+    function lines(name, struct) {
+      pv.rm(name)
+      pv.lines(name, struct, {color:ccolor});
+    }
+
+    function cartoon(name, struct) {
+      pv.rm(name)
+      var ccolor = getcolor(name);
+      if (ccolor == null) {
+        ccolor = color.ssSuccession();
+      }
+      pv.cartoon(name, struct, {color:ccolor});
+    }
+
+    function lineTrace(name, struct) {
+      pv.rm(name)
+      pv.lineTrace(name, struct, {color:getcolor(name)});
+    }
+
+    function sline(name, struct) {
+      pv.rm(name)
+      pv.sline(name, struct, {color:getcolor(name)});
+    }
+
+    function ballsAndSticks(name, struct) {
+      pv.rm(name)
+      pv.ballsAndSticks(name, struct, {color:getcolor(name)});
+    }
+
+    function trace(name, struct) {
+      pv.rm(name)
+      pv.trace(name, struct, {color:getcolor(name)});
+    }
+    
+    function loadModel(file, name, func) {
+      $.ajax({ url : file, success : function(data) {
+        structs[name] = io.pdb(data);
+        structure = structs[name];
+      func(name, structs[name]);
+      if (name == "protein") {
+            pv.autoZoom();
+        }
+      }});
+    }
+    
+    $('#protein-cartoon').click(function() {
+      cartoon("protein", structs['protein']);
+    });
+    
+    $('#protein-ballsandsticks').click(function() {
+      ballsAndSticks("protein", structs['protein']);
+    });
+    
+    $('#protein-line-trace').click(function() {
+      lineTrace("protein", structs["protein"]);
+    });
+    
+    $('#protein-lines').click(function() {
+      lines("protein", structs["protein"]);
+    });
+    
+    $('#protein-trace').click(function() {
+      trace("protein", structs["protein"]);
+    });
+    
+    $('#protein-sline').click(function() {
+      sline("protein", structs["protein"]);
+    });
+    
+    $('#protein-tube').click(function() {
+      tube("protein", structs["protein"]);
+    });
+    
+    $('#ligand-ballsandsticks').click(function() {
+      ballsAndSticks("ligand", structs["ligand"]);
+    });
+    
+    $('#ligand-lines').click(function() {
+      lines("ligand", structs["ligand"]);
+    });
+
+    $('#color-default').click(function() {
+      $('#protein input:checked').click();
+    });
+
+    $('#color-succession').click(function() {
+      $('#protein input:checked').click();
+    });
+
+    $('#color-tempfactor').click(function() {
+      $('#protein input:checked').click();
+    });
+    
+    $('#color-occupancy').click(function() {
+      $('#protein input:checked').click();
+    });
+
+    $('#color-gradient').on("change mousemove", function() {
+      $('#protein input:checked').click(); 
+    });
+
+    pv.addListener("atomClicked", function(picked, originalEvent) {
+      if (picked) {
+        var newAtom = picked.object().atom;
+        var geom = picked.object().geom;
+        console.log(" Residue number=" + newAtom.residue().num());
+      }
+    });
+    
+    $(document).ready(function() {
+        $('#color-default').prop("checked", true);
+        loadModel('/data/jobs/MTiOpenScreen/O27232863223076/receptor.pdb', "protein", cartoon);
+        $('#slider').slick({
+        variableWidth: true,
+        focusOnSelect: true,
+        slidesToShow: 1,
+        infinite: false,
+        onAfterChange: function(slide, index){
+                var ligand_file = $(slide.$slides.get(index)).attr('id');
+                loadModel('/data/jobs/MTiOpenScreen/O27232863223076/' + ligand_file, "ligand", ballsAndSticks);
+            }
+        });
+
+        $('#slider').slickGoTo(0);
+    });
+  </script>
+</html>
