@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pose explorer</title>
+    <link href="/portal/css/mobyle.css" rel="stylesheet" type="text/css" media="screen">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.3.15/slick.css"/>
+    <script type="text/javascript" src='/portal/js/jquery.js'></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.3.15/slick.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+    .slick-prev:before, .slick-next:before { color: green; }
+    #slider { margin-left: 25px; margin-right: 25px; display: block; box-sizing: border box; position: relative; width: 750px;  }
+    .slider-ligand {  cursor: pointer; text-align: center; border: 1px dashed #ccc; height: 80px; margin: 10px; padding: 10px; line-height: 40px; }
+    div.slick-active { background-color: rgb(185, 232, 186); }
+    </style>
+  </head>
+    
+  <body>
+    
+    <table>
+      <tr>
+        <td width="800">
+          <div id="gl"></div>
+        </td>
+        <td>
+          <div id="protein">
+            <h3>Protein style</h3>
+            <input type="radio" name="protein-representation" id="protein-cartoon" checked>Cartoon</input><br/>
+            <input type="radio" name="protein-representation" id="protein-ballsandsticks">Balls & Sticks</input><br/>
+            <input type="radio" name="protein-representation" id="protein-lines">Lines</input><br/>
+            <input type="radio" name="protein-representation" id="protein-line-trace">Line Trace</input><br/>
+            <input type="radio" name="protein-representation" id="protein-sline">Smooth Line Trace</input><br/>
+            <input type="radio" name="protein-representation" id="protein-trace">Trace</input><br/>
+          </div>
+
+          <div id=color>
+            <h3>Color by</h3>
+            <input type="radio" name="color-representation" id="color-default">Default</input><br/>
+            <input type="radio" name="color-representation" id="color-succession">Succession</input><br/>
+            <input type="radio" name="color-representation" id="color-occupancy">Occupancy</input><br/>
+            <input type="radio" name="color-representation" id="color-tempfactor">Temperature factor</input><br/>
+            Intensity: <input type="range" id="color-gradient" step="0.01" min="0.01" max="0.99" />
+          </div>
+          
+          <div id=ligand>
+            <h3>Ligand style</h3>
+            <input type="radio" name="ligand-representation" id="ligand-ballsandsticks" checked>Balls & Sticks</input><br/>
+            <input type="radio" name="ligand-representation" id="ligand-lines">Lines</input><br/>
+          </div>
+
+        </td>
+      </tr>
+      <tr>
+          <td>
+            <h2>Select ligand to show:</h2>
+            <div id="slider">
+                
+                <div class="slider-ligand" id="pdb_out/model1.pdb"><h3>24343090_Intermediate</h3><p>MODEL 1, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model2.pdb"><h3>103159600_Intermediate</h3><p>MODEL 2, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model3.pdb"><h3>24800118_Intermediate</h3><p>MODEL 3, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model4.pdb"><h3>14740705_Intermediate</h3><p>MODEL 4, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model5.pdb"><h3>24784936_Intermediate</h3><p>MODEL 5, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model6.pdb"><h3>17445640_Intermediate</h3><p>MODEL 6, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model7.pdb"><h3>14736677_Intermediate</h3><p>MODEL 7, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model8.pdb"><h3>17509462_Intermediate</h3><p>MODEL 8, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model9.pdb"><h3>844164_Intermediate</h3><p>MODEL 9, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model10.pdb"><h3>24357067_Intermediate</h3><p>MODEL 10, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model11.pdb"><h3>85148861_Intermediate</h3><p>MODEL 11, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model12.pdb"><h3>24388208_Intermediate</h3><p>MODEL 12, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model13.pdb"><h3>24821332_Intermediate</h3><p>MODEL 13, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model14.pdb"><h3>4245853_Intermediate</h3><p>MODEL 14, -0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model15.pdb"><h3>89850584_Intermediate</h3><p>MODEL 15, 0.0 kCal/mol</p></div>
+                
+                <div class="slider-ligand" id="pdb_out/model16.pdb"><h3>14740370_Intermediate</h3><p>MODEL 16, -0.0 kCal/mol</p></div>
+                
+            </div>
+          </td>
+          <td></td>
+      </tr>
+    </table>
+   
+  </body>
+  <script src='/portal/js/pv/pv.min.js'></script>
+  <script>
+
+    var pv = pv.Viewer(document.getElementById('gl'), {
+               width: 800,
+               height: 600,
+               antialias: true,
+               quality: 'high',
+               outline: false
+             });
+
+    var structs = {};
+    var structure; // this variable must exist
+
+    function getcolor(name) {
+      var ccolor = null;
+      var color_name = $('#color input:checked').attr('id');
+      if (name == "ligand") {
+          return ccolor;
+      } else {
+        if (color_name == "color-occupancy") {
+          ccolor = color.byAtomProp('occupancy');
+        }
+        if (color_name == "color-tempfactor") {
+          var color_map = ['red','white','blue']
+          var threshold = parseFloat(1.0 - $('#color-gradient').val());
+          var steps = [0.0, threshold, 1.0];
+          ccolor = color.byAtomProp('tempFactor', color.gradient(color_map, steps));
+        }
+        if (color_name == "color-default") {
+          ccolor = color.uniform('orange');
+        }
+      }
+      return ccolor;
+    }
+
+    function lines(name, struct) {
+      pv.rm(name)
+      pv.lines(name, struct, {color:ccolor});
+    }
+
+    function cartoon(name, struct) {
+      pv.rm(name)
+      var ccolor = getcolor(name);
+      if (ccolor == null) {
+        ccolor = color.ssSuccession();
+      }
+      pv.cartoon(name, struct, {color:ccolor});
+    }
+
+    function lineTrace(name, struct) {
+      pv.rm(name)
+      pv.lineTrace(name, struct, {color:getcolor(name)});
+    }
+
+    function sline(name, struct) {
+      pv.rm(name)
+      pv.sline(name, struct, {color:getcolor(name)});
+    }
+
+    function ballsAndSticks(name, struct) {
+      pv.rm(name)
+      pv.ballsAndSticks(name, struct, {color:getcolor(name)});
+    }
+
+    function trace(name, struct) {
+      pv.rm(name)
+      pv.trace(name, struct, {color:getcolor(name)});
+    }
+    
+    function loadModel(file, name, func) {
+      $.ajax({ url : file, success : function(data) {
+        structs[name] = io.pdb(data);
+        structure = structs[name];
+      func(name, structs[name]);
+      if (name == "protein") {
+            pv.autoZoom();
+        }
+      }});
+    }
+    
+    $('#protein-cartoon').click(function() {
+      cartoon("protein", structs['protein']);
+    });
+    
+    $('#protein-ballsandsticks').click(function() {
+      ballsAndSticks("protein", structs['protein']);
+    });
+    
+    $('#protein-line-trace').click(function() {
+      lineTrace("protein", structs["protein"]);
+    });
+    
+    $('#protein-lines').click(function() {
+      lines("protein", structs["protein"]);
+    });
+    
+    $('#protein-trace').click(function() {
+      trace("protein", structs["protein"]);
+    });
+    
+    $('#protein-sline').click(function() {
+      sline("protein", structs["protein"]);
+    });
+    
+    $('#protein-tube').click(function() {
+      tube("protein", structs["protein"]);
+    });
+    
+    $('#ligand-ballsandsticks').click(function() {
+      ballsAndSticks("ligand", structs["ligand"]);
+    });
+    
+    $('#ligand-lines').click(function() {
+      lines("ligand", structs["ligand"]);
+    });
+
+    $('#color-default').click(function() {
+      $('#protein input:checked').click();
+    });
+
+    $('#color-succession').click(function() {
+      $('#protein input:checked').click();
+    });
+
+    $('#color-tempfactor').click(function() {
+      $('#protein input:checked').click();
+    });
+    
+    $('#color-occupancy').click(function() {
+      $('#protein input:checked').click();
+    });
+
+    $('#color-gradient').on("change mousemove", function() {
+      $('#protein input:checked').click(); 
+    });
+
+    pv.addListener("atomClicked", function(picked, originalEvent) {
+      if (picked) {
+        var newAtom = picked.object().atom;
+        var geom = picked.object().geom;
+        console.log(" Residue number=" + newAtom.residue().num());
+      }
+    });
+    
+    $(document).ready(function() {
+        $('#color-default').prop("checked", true);
+        loadModel('/data/jobs/MTiOpenScreen/K19632373094082/receptor.pdb', "protein", cartoon);
+        $('#slider').slick({
+        variableWidth: true,
+        focusOnSelect: true,
+        slidesToShow: 1,
+        infinite: false,
+        onAfterChange: function(slide, index){
+                var ligand_file = $(slide.$slides.get(index)).attr('id');
+                loadModel('/data/jobs/MTiOpenScreen/K19632373094082/' + ligand_file, "ligand", ballsAndSticks);
+            }
+        });
+
+        $('#slider').slickGoTo(0);
+    });
+  </script>
+</html>

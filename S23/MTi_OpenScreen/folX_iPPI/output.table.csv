@@ -1,0 +1,17 @@
+Compound,Model ID,Energy,nRot,Library,isLeadLike,HBA,HBD,LogP,MW,TPSA
+24343090_Intermediate,1,0.0,4,iPPI-lib,Y,6,2,4.38,444.5190032,103.12
+103159600_Intermediate,1,-0.0,6,iPPI-lib,Y,4,1,5.04,407.33346,41.57
+24800118_Intermediate,1,0.0,7,iPPI-lib,Y,5,1,3.76,385.50468,49.74
+14740705_Intermediate,1,-0.0,2,iPPI-lib,Y,2,0,4.52,301.38166,20.31
+24784936_Intermediate,1,-0.0,9,iPPI-lib,N,8,1,2.43,426.48878,120.64
+17445640_Intermediate,1,-0.0,2,iPPI-lib,Y,3,0,5.38,347.21852,67.16
+14736677_Intermediate,1,-0.0,3,iPPI-lib,Y,4,0,3.15,252.31434,43.08
+17509462_Intermediate,1,-0.0,6,iPPI-lib,N,7,2,3.41,497.009,123.59
+844164_Intermediate,1,0.0,2,iPPI-lib,Y,7,0,2.42,291.26426,85.85
+24357067_Intermediate,1,-0.0,5,iPPI-lib,Y,4,1,2.96,314.40202,59.48
+85148861_Intermediate,1,-0.0,7,iPPI-lib,Y,5,1,3.94,407.50206,64.63
+24388208_Intermediate,1,-0.0,5,iPPI-lib,Y,5,0,4.43,370.82946,57.26
+24821332_Intermediate,1,0.0,7,iPPI-lib,Y,10,2,2.05,370.31626,146.29
+4245853_Intermediate,1,-0.0,4,iPPI-lib,Y,7,0,3.3,434.5307,69.48
+89850584_Intermediate,1,0.0,9,iPPI-lib,N,10,3,2.79,496.4892,156.48
+14740370_Intermediate,1,-0.0,2,iPPI-lib,N,3,1,4.7,305.37036,42.24
