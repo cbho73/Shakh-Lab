@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/service/MTiOpenScreen.py", line 580, in <module>
+    main()
+  File "/service/MTiOpenScreen.py", line 568, in main
+    run_openscreen_reduce('output', args, nr_ligands = 1500)
+  File "/service/MTiOpenScreen.py", line 375, in run_openscreen_reduce
+    raise Exception("No ranked models found.")
+Exception: No ranked models found.
