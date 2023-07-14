@@ -1,0 +1,11 @@
+gets cavities of a pdb, option "-t `x`" gives top `x` cavities
+./getCleft -p pdb/folB_2o90_nolig.pdb -o isomif_out/2o90 -s -t 5
+
+gets cavity for a specific ligand, formatting is compound abbreviation (NEU), location (131), chain (A), alternate location (or dash if none) (-)
+./getCleft -p ./pdb/folB_2o90.pdb -o ./isomif_out/clefts/folB_2o90 -s -a NEU131A-
+
+correct placement of hydrogens
+reduce -p ./pdb/folB_2o90.pdb > ./pdb/folB_2o90h.pdb 
+
+calculating the molecular interaction field
+./mif -p ./pdb/folB_2o90h.pdb -g ./isomif_out/clefts/2o90_NEU131A-_sph_1.pdb -o ./isomif_out/mifs/ -l NEU131A -r 3 -t 2o90
